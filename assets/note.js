@@ -1,6 +1,5 @@
 (function () {
   var PROJECT_ID = 29756;
-  var API_BASE = '/iapi/project/' + PROJECT_ID + '/tenant-auth/';
   var NOTE_FILE_ID = 928;
   var AUDIO_FILE_ID = 925;
   var token = sessionStorage.getItem('tenant_token') || localStorage.getItem('tenant_token');
@@ -9,7 +8,6 @@
   var content = document.getElementById('note-content');
   var noteImage = document.getElementById('private-note-image');
   var audio = document.getElementById('voice-recording');
-  var sapi;
 
   function clearTokens() {
     sessionStorage.removeItem('tenant_token');
@@ -17,7 +15,6 @@
     localStorage.removeItem('tenant_token');
     localStorage.removeItem('tenant_refresh');
     document.cookie = 'tenant_token=; path=/; max-age=0; SameSite=Lax; Secure';
-    if (sapi && typeof sapi.clearBearer === 'function') sapi.clearBearer();
   }
   function saveTokens(data) {
     token = data.token;
@@ -29,8 +26,8 @@
     document.cookie = 'tenant_token=' + encodeURIComponent(token) + '; path=/; max-age=86400; SameSite=Lax; Secure';
   }
   async function postAuth(endpoint, payload) {
-    var response = await fetch(API_BASE + endpoint, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify(payload) });
-    return response.json();
+    var response = await window.MemoryVaultApi.tenantAuth(endpoint, payload);
+    return response.data;
   }
   async function verifyOrRefresh() {
     if (!token) return false;
@@ -46,7 +43,7 @@
     } catch (error) { return false; }
   }
   async function downloadUrl(fileId) {
-    var response = await sapi.call('POST','/execute/gated-files/download',{file_id:fileId});
+    var response = await window.MemoryVaultApi.memberAction('download', {file_id:fileId}, token);
     if (!response || !response.data || !response.data.success) {
       var message=response&&response.data&&response.data.error&&response.data.error.message;
       throw new Error(message||'A private memory could not be opened.');
@@ -59,19 +56,13 @@
     var oldToken=token;
     clearTokens();
     try { await postAuth('logout',{token:oldToken}); } catch(error) { /* local lock still works */ }
-    window.location.replace('/login.html');
+    window.location.replace('login.html');
   }
   async function start() {
     status.textContent='Checking your private session…';
-    if (!token) { window.location.replace('/login.html'); return; }
-    if (!await verifyOrRefresh()) { clearTokens(); window.location.replace('/login.html'); return; }
+    if (!token) { window.location.replace('login.html'); return; }
+    if (!await verifyOrRefresh()) { clearTokens(); window.location.replace('login.html'); return; }
     status.textContent='Connecting to the private vault…';
-    if (!window.WP || typeof window.WP.sapi!=='function') {
-      status.textContent='The private note could not connect. Refresh the page and try again.';
-      status.dataset.kind='error'; return;
-    }
-    sapi=window.WP.sapi(PROJECT_ID);
-    sapi.setBearer(token);
     try {
       status.textContent='Opening your private love letter…';
       noteImage.src=await downloadUrl(NOTE_FILE_ID);
