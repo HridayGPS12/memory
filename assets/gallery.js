@@ -23,6 +23,7 @@
   var currentRefresh = sessionStorage.getItem('tenant_refresh') || localStorage.getItem('tenant_refresh');
   var visibleCount = 0;
   var totalCount = 0;
+  var nextOffset = 0;
   var busy = false;
   var toastTimer;
 
@@ -149,6 +150,7 @@
       gallery.replaceChildren();
       visibleCount = 0;
       totalCount = 0;
+      nextOffset = 0;
       setUploadStatus('Gathering your saved moments…', '');
     }
     try {
@@ -156,7 +158,10 @@
       if (!response || !response.data || !response.data.success) {
         throw new Error('Your private photos could not be loaded. Please unlock the vault again.');
       }
-      var files = (response.data.result && response.data.result.files) || [];
+      var records = (response.data.result && response.data.result.files) || [];
+      var files = records.filter(function (file) { var type = String(file.content_type || '').toLowerCase();
+        var name = String(file.filename || '').toLowerCase();
+        return !name.endsWith('.svg') && (type.indexOf('image/') === 0 || name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp') || name.endsWith('.gif')); });
       var total = Number(response.data.result && response.data.result.total);
       if (Number.isFinite(total)) totalCount = total;
       var urls = await Promise.all(files.map(async function (file) {
@@ -167,8 +172,9 @@
         if (urls[index]) gallery.appendChild(createPhotoCard(file, urls[index]));
       });
       visibleCount += files.length;
-      count.textContent = String(totalCount || visibleCount);
-      var hasMore = files.length === PAGE_SIZE && (totalCount === 0 || visibleCount < totalCount);
+      nextOffset = offset + records.length;
+      count.textContent = String(visibleCount);
+      var hasMore = records.length === PAGE_SIZE && (totalCount === 0 || nextOffset < totalCount);
       loadMoreWrap.hidden = !hasMore;
       emptyState.hidden = visibleCount > 0;
       setUploadStatus('', '');
@@ -253,9 +259,10 @@
   emptyUploadButton.addEventListener('click', function () { photoInput.click(); });
   photoInput.addEventListener('change', function () { uploadPhotos(Array.from(photoInput.files || [])); });
   logoutButton.addEventListener('click', logout);
-  loadMoreButton.addEventListener('click', function () { loadPage(visibleCount, true); });
+  loadMoreButton.addEventListener('click', function () { loadPage(nextOffset, true); });
   document.getElementById('close-dialog').addEventListener('click', function () { dialog.close(); });
   dialog.addEventListener('click', function (event) { if (event.target === dialog) dialog.close(); });
   dialog.addEventListener('close', function () { lightboxImage.removeAttribute('src'); });
   start();
 })();
+
