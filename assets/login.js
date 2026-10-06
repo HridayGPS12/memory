@@ -42,7 +42,7 @@
     submitButton.setAttribute('aria-busy', 'true');
     setStatus('Opening your private memory box…', '');
     try {
-      var response = await fetch('/iapi/project/' + PROJECT_ID + '/tenant-auth/login', {
+      var response = await fetch('https://api.websitepublisher.ai/iapi/project/' + PROJECT_ID + '/tenant-auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ email: LOGIN_EMAIL, password: password })
@@ -53,7 +53,7 @@
       }
       saveTokens(data);
       setStatus('Your memories are ready.', 'success');
-      window.location.replace(data.success_url || '/memories.html');
+      window.location.replace('memories.html');
     } catch (error) {
       setStatus(error.message || 'We could not connect just now. Please try again.', 'error');
       submitButton.disabled = false;
