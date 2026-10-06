@@ -1,6 +1,5 @@
 (function () {
   var PROJECT_ID = 29756;
-  var API_BASE = '/iapi/project/' + PROJECT_ID + '/tenant-auth/';
   var PAGE_SIZE = 50;
   var MAX_FILE_BYTES = 26214400;
   var TOKEN_COOKIE = 'tenant_token';
@@ -18,7 +17,6 @@
   var dialog = document.getElementById('photo-dialog');
   var lightboxImage = document.getElementById('lightbox-image');
   var lightboxCaption = document.getElementById('lightbox-caption');
-  var sapi;
   var currentToken = sessionStorage.getItem('tenant_token') || localStorage.getItem('tenant_token');
   var currentRefresh = sessionStorage.getItem('tenant_refresh') || localStorage.getItem('tenant_refresh');
   var visibleCount = 0;
@@ -33,7 +31,6 @@
     localStorage.removeItem('tenant_token');
     localStorage.removeItem('tenant_refresh');
     document.cookie = TOKEN_COOKIE + '=; path=/; max-age=0; SameSite=Lax; Secure';
-    if (sapi && typeof sapi.clearBearer === 'function') sapi.clearBearer();
   }
 
   function saveTokens(data) {
@@ -44,16 +41,11 @@
     localStorage.setItem('tenant_token', currentToken);
     localStorage.setItem('tenant_refresh', currentRefresh);
     document.cookie = TOKEN_COOKIE + '=' + encodeURIComponent(currentToken) + '; path=/; max-age=86400; SameSite=Lax; Secure';
-    if (sapi) sapi.setBearer(currentToken);
   }
 
   async function postAuth(endpoint, payload) {
-    var response = await fetch(API_BASE + endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    return response.json();
+    var response = await window.MemoryVaultApi.tenantAuth(endpoint, payload);
+    return response.data;
   }
 
   function setUploadStatus(message, kind) {
@@ -98,7 +90,7 @@
   }
 
   async function getDownloadUrl(fileId) {
-    var response = await sapi.call('POST', '/execute/gated-files/download', { file_id: fileId });
+    var response = await window.MemoryVaultApi.memberAction('download', { file_id: fileId }, currentToken);
     if (!response || !response.data || !response.data.success) {
       var message = response && response.data && response.data.error && response.data.error.message;
       throw new Error(message || 'A private photo could not be opened.');
@@ -154,7 +146,7 @@
       setUploadStatus('Gathering your saved moments…', '');
     }
     try {
-      var response = await sapi.call('POST', '/execute/gated-files/list-mine', { limit: PAGE_SIZE, offset: offset });
+      var response = await window.MemoryVaultApi.memberAction('list-mine', { limit: PAGE_SIZE, offset: offset }, currentToken);
       if (!response || !response.data || !response.data.success) {
         throw new Error('Your private photos could not be loaded. Please unlock the vault again.');
       }
@@ -207,7 +199,7 @@
       setUploadStatus('Saving ' + (i + 1) + ' of ' + files.length + ' to private storage…', '');
       uploadButton.disabled = true;
       try {
-        var response = await sapi.callUpload('/execute/gated-files/put-upload', { file: file, title: title });
+        var response = await window.MemoryVaultApi.memberUpload(file, title, currentToken);
         if (!response || !response.data || !response.data.success) {
           var reason = response && response.data && response.data.error && response.data.error.message;
           throw new Error(reason || 'This photo could not be saved.');
@@ -232,26 +224,20 @@
     var token = currentToken;
     clearTokens();
     try { await postAuth('logout', { token: token }); } catch (error) { /* local lock still succeeds */ }
-    window.location.replace('/login.html');
+    window.location.replace('login.html');
   }
 
   async function start() {
     if (!currentToken) {
-      window.location.replace('/login.html');
+      window.location.replace('login.html');
       return;
     }
     var valid = await verifyOrRefresh();
     if (!valid) {
       clearTokens();
-      window.location.replace('/login.html');
+      window.location.replace('login.html');
       return;
     }
-    if (!window.WP || typeof window.WP.sapi !== 'function') {
-      setUploadStatus('The private gallery could not connect. Refresh the page and try again.', 'error');
-      return;
-    }
-    sapi = WP.sapi(PROJECT_ID);
-    sapi.setBearer(currentToken);
     await loadPage(0, false);
   }
 
