@@ -10,14 +10,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-  <link href="https://cdn.websitepublisher.ai/custom/wid29756/assets/styles.css" rel="stylesheet">
+  <link href="assets/styles.css" rel="stylesheet">
 </head>
 <body>
   <script>
     var memoryToken = sessionStorage.getItem('tenant_token') || localStorage.getItem('tenant_token');
-    if (!memoryToken) window.location.replace('/login.html');
+    if (!memoryToken) window.location.replace('login.html');
   </script>
-  <!--#wps-include fragment="site-header" -->
+<header class="site-nav">
+  <div class="page-width nav-inner">
+    <a class="brand" href="memories.html" aria-label="Open our private memory vault">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20.4 8.7c0 5.1-8.4 10-8.4 10s-8.4-4.9-8.4-10a4.6 4.6 0 0 1 8.4-2.5 4.6 4.6 0 0 1 8.4 2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.3 11.1h2l1.2-2.1 1.7 4 1.2-2h1.3" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span><span class="brand-name">Ours, always</span><span class="brand-note">a little archive of us</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="our-note.html">Our note</a>
+      <a href="memories.html">Memory vault</a>
+    </nav>
+    <a class="nav-cta" href="our-note.html">Read our note <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11M10.5 5.5 15 10l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
+</header>
   <main class="page-width vault-main">
     <section class="vault-intro" aria-labelledby="vault-title">
       <div>
@@ -60,9 +72,14 @@
     <div class="lightbox-caption" id="lightbox-caption"></div>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <!--#wps-include fragment="site-footer" -->
-  <script src="https://cdn.websitepublisher.ai/js/sapi-client.js"></script>
-  <script src="https://cdn.websitepublisher.ai/custom/wid29756/assets/gallery.js?v=20261006-2"></script>
+<footer class="site-footer">
+  <div class="page-width footer-inner">
+    <span class="footer-note"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16.8 7.4c0 4.1-6.8 8.1-6.8 8.1S3.2 11.5 3.2 7.4a3.7 3.7 0 0 1 6.8-2 3.7 3.7 0 0 1 6.8 2Z" stroke="currentColor" stroke-width="1.4"/></svg>A small place for the moments that feel like home.</span>
+    <div class="footer-links"><a href="our-note.html">Our note</a><a href="memories.html">Private memory vault</a></div>
+  </div>
+</footer>
+  <script src="assets/api.js"></script>
+  <script src="assets/gallery.js"></script>
 </body>
 </html>
 
