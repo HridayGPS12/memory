@@ -11,7 +11,7 @@ A soft, romantic private space for a shared love letter, voice note, and photo m
 
 ## Privacy and storage
 
-- This GitHub repository is private and contains only the site source. It does not contain the passcode, letter, voice recording, or photos.
+- This GitHub repository is public and contains only the site source. It does not contain the passcode, letter, voice recording, or photos.
 - Tenant Auth checks the shared passcode on the server. Membership is provisioned; visitors cannot sign themselves up.
 - Photos, the letter artwork, and the voice recording live in WebsitePublisher's private Gated Files storage, not in the website's public asset library or this repository.
 - File access is checked against the signed-in member. Photos, the letter, and recording are delivered with short-lived links.
