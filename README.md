@@ -4,14 +4,14 @@ A soft, romantic private space for a shared love letter, voice note, and photo m
 
 ## Live pages
 
-- Home: https://project29756.websitepublisher.ai/ (sends visitors to sign-in)
-- Private sign-in: https://project29756.websitepublisher.ai/login.html
-- Private love letter and voice note: https://project29756.websitepublisher.ai/our-note.html
-- Private photo gallery: https://project29756.websitepublisher.ai/memories.html
+- Home: https://hridaygps12.github.io/memory/ (GitHub Pages home; sends visitors to sign-in)
+- Private sign-in: https://hridaygps12.github.io/memory/login.html
+- Private love letter and voice note: https://hridaygps12.github.io/memory/our-note.html
+- Private photo gallery: https://hridaygps12.github.io/memory/memories.html
 
 ## Privacy and storage
 
-- This GitHub repository is public and contains only the site source. It does not contain the passcode, letter, voice recording, or photos.
+- This GitHub repository and its Pages site are public and contain only the site source. It does not contain the passcode, letter, voice recording, or photos.
 - Tenant Auth checks the shared passcode on the server. Membership is provisioned; visitors cannot sign themselves up.
 - Photos, the letter artwork, and the voice recording live in WebsitePublisher's private Gated Files storage, not in the website's public asset library or this repository.
 - File access is checked against the signed-in member. Photos, the letter, and recording are delivered with short-lived links.
